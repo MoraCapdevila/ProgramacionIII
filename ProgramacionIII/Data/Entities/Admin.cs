@@ -3,6 +3,6 @@
     public class Admin : User
     {
         public ICollection<Product> Products { get; set; } = new List<Product>();
-        public ICollection<Sale> Sale { get; set; } = new List<Sale>();
+        public ICollection<SaleOrder> Sale { get; set; } = new List<SaleOrder>();
     }
 }

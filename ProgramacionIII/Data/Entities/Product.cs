@@ -16,6 +16,6 @@ namespace ProgramacionIII.Data.Entities
 
         public ICollection<Admin> Admins { get; set; } = new List<Admin>();
         public ICollection<Customer> Customers { get; set; } = new List<Customer>();
-        public ICollection<Sale> Sales { get; set; } = new List<Sale>();
+        public ICollection<SaleOrder> SaleOrders { get; set; } = new List<SaleOrder>();
     }
 }

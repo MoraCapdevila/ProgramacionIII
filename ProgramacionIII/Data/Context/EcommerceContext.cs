@@ -8,17 +8,13 @@ namespace ProgramacionIII.Data.Context
     {
         public DbSet<Product> Products { get; set; }
         public DbSet<User> Users { get; set; }
-        public DbSet<Sale> Sales { get; set; }
+        public DbSet<SaleOrder> SaleOrders { get; set; }
         public DbSet<Customer> Customers { get; set; }
-
         public DbSet<SaleOrderLine> SaleOrderLines { get; set; }
 
         public DbSet<Admin> Admin { get; set; }
 
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    optionsBuilder.UseSqlite("Data Source=EcommerceContext.db");
-        //}
+        
         public EcommerceContext(DbContextOptions<EcommerceContext> dbContextOptions) : base(dbContextOptions)
         {
 
@@ -82,7 +78,23 @@ namespace ProgramacionIII.Data.Context
                     Price = 5000
                 });
 
-            //hay que establecer bien las relaciones y poder plantear las tablas
+            //Customer-SO 1-N
+            modelBuilder.Entity<Customer>()
+                .HasMany(s => s.SaleOrders)
+                .WithOne(c => c.Customer) 
+                .HasForeingKey(f => f.CustomerId); 
+
+            //SOL - SO 1-N
+            modelBuilder.Entity<SaleOrder>()
+                .HasMany(s => s.SaleOrderLines) 
+                .WithOne(c => c.SaleOrder) 
+                .HasForeingKey(f => f.SaleOrderId);
+
+            //SOL - PRODUCT N-1
+            modelBuilder.Entity<SaleOrderLine>()
+                .HasOne(s => s.Product) 
+                .WithMany() //no lo quiero guardar
+                .HasForeingKey(f => f.ProductId);
 
             base.OnModelCreating(modelBuilder);
         }
