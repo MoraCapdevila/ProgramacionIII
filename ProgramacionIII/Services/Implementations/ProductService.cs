@@ -1,5 +1,6 @@
 ﻿using ProgramacionIII.Data.Context;
 using ProgramacionIII.Data.Entities;
+using ProgramacionIII.Data.Models;
 using ProgramacionIII.Services.Interfaces;
 
 namespace ProgramacionIII.Services.Implementations
@@ -13,16 +14,21 @@ namespace ProgramacionIII.Services.Implementations
             _context = context;
         }
 
+        public List<Product> GetProducts()
+        {
+            return _context.Products.ToList();
+        }
+
         public Product GetProductById (int id)
         {
             return _context.Products.FirstOrDefault(p => p.Id == id);
         }
 
-        public Product CreateProduct (Product product) 
+        public int CreateProduct(Product product) 
         {
             _context.Products.Add(product);
             _context.SaveChanges();
-            return product;
+            return product.Id;
         }
 
         public void UpdateProduct(Product product) 
@@ -31,11 +37,15 @@ namespace ProgramacionIII.Services.Implementations
            _context.SaveChanges();
         }
 
-        public void DeleteProduct(int id)
+        public async Task DeleteProduct(int id)
         {
-            Product productToDelete = _context.Products.FirstOrDefault(u => u.Id == id);
-            _context.Products.Remove(productToDelete);
-            _context.SaveChanges();
+            var product = await _context.Products.FindAsync(id);
+            if (product != null)
+            {
+                _context.Products.Remove(product);
+                _context.SaveChanges();
+            }
+           
         }
     }
 }

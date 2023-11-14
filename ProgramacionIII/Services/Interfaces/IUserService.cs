@@ -8,7 +8,7 @@ namespace ProgramacionIII.Services.Interfaces
         public User? GetUserByUsername(string username);
 
         public int CreateUser(User user);
-        public void UpdateUser(string username, CustomerPutDto updateUser);
+        public string UpdateUser(User user);
 
         public void DeleteUser(string username);
     }

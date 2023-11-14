@@ -5,9 +5,11 @@ namespace ProgramacionIII.Services.Interfaces
     public interface IProductService
     {
         public Product GetProductById(int id);
-        public Product CreateProduct(Product product);
+
+        public List<Product> GetProducts();
+        public int CreateProduct(Product product);
         public void UpdateProduct(Product product);
 
-        public void DeleteProduct(int id);
+        public Task DeleteProduct(int id);
     }
 }

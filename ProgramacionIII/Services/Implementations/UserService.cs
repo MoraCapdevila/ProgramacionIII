@@ -26,20 +26,36 @@ namespace ProgramacionIII.Services.Implementations
             return user.Id;
         }
 
-        public void UpdateUser(string username, CustomerPutDto updateUser)
+        public string UpdateUser(User user)
         {
-            User existingCustomer = _context.Users.FirstOrDefault(u => u.UserName == username);
+            var existingUser = _context.Users.FirstOrDefault(u => u.UserName == user.UserName);
+            existingUser.Name=user.Name;
+            existingUser.Email=user.Email;
+            existingUser.LastName = user.LastName;
+            existingUser.UserName = user.UserName;
+            existingUser.Password = user.Password;
 
-            if (existingCustomer != null)
-            {
 
-                existingCustomer.LastName = updateUser.LastName ?? existingCustomer.LastName;
-                existingCustomer.Name = updateUser.Name ?? existingCustomer.Name;
-                existingCustomer.Password = updateUser.Password ?? existingCustomer.Password;
-                existingCustomer.UserName = updateUser.UserName ?? existingCustomer.UserName;
-                existingCustomer.UserType = "Customer";
-            }
+            _context.Update(existingUser);
             _context.SaveChanges();
+            return existingUser.UserName;
+          
+
+            
+            
+            
+            //User existingCustomer = _context.Users.FirstOrDefault(u => u.UserName == username);
+
+            //if (existingCustomer != null)
+            //{
+
+            //    existingCustomer.LastName = updateUser.LastName ?? existingCustomer.LastName;
+            //    existingCustomer.Name = updateUser.Name ?? existingCustomer.Name;
+            //    existingCustomer.Password = updateUser.Password ?? existingCustomer.Password;
+            //    existingCustomer.UserName = updateUser.UserName ?? existingCustomer.UserName;
+            //    existingCustomer.UserType = "Customer";
+            //}
+            //_context.SaveChanges();
          
         }
 

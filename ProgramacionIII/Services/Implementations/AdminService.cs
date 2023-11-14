@@ -1,4 +1,5 @@
 ﻿using ProgramacionIII.Data.Context;
+using ProgramacionIII.Data.Entities;
 using ProgramacionIII.Services.Interfaces;
 
 namespace ProgramacionIII.Services.Implementations
@@ -10,6 +11,11 @@ namespace ProgramacionIII.Services.Implementations
         public AdminService(EcommerceContext context)
         {
             _context = context;
+        }
+
+        public List<User> GetAllAdmins()
+        {
+            return _context.Users.Where(c => c.UserType == "Admin").ToList();
         }
     }
 }

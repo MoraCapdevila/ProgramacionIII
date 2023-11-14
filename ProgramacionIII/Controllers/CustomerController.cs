@@ -35,53 +35,25 @@ namespace ProgramacionIII.Controllers
             return Ok(_userService.GetUserByUsername(username));
         }
 
-        [HttpPost]
-        public IActionResult CreateCustomer([FromBody] CustomerPostDto dto)
-        {
-            var customer = new Customer()
-            {
-                Email = dto.Email,
-                Name = dto.Name,
-                LastName = dto.LastName,
-                Password = dto.Password,
-                UserName = dto.UserName,
-                UserType = "Customer"
-            };
-            int id = _userService.CreateUser(customer);
-            return Ok(id);
-        }
+
 
         [HttpPut("{username}")]
-        public IActionResult UpdateCustomer([FromRoute]string username,[FromBody]CustomerPutDto updateUser)
+        public IActionResult UpdateCustomer([FromRoute] string username, [FromBody] UserPutDto updateUser)
         {
-            User existingCustomer = _userService.GetUserByUsername(username);
-            if (existingCustomer == null)
+            var adminToUpdate = new Admin()
             {
-                return NotFound($"No se encontró un cliente con el nombre de usuario '{username}'.");
-            }
-            existingCustomer.LastName = updateUser.LastName ?? existingCustomer.LastName;
-            existingCustomer.Name = updateUser.Name ?? existingCustomer.Name;
-            existingCustomer.Password = updateUser.Password ?? existingCustomer.Password;
-            existingCustomer.UserName = updateUser.UserName ?? existingCustomer.UserName;
-            //agregar email
-
-            _userService.UpdateUser(username,updateUser);
-            return Ok();
-
-           
+                Name = updateUser.Name,
+                LastName = updateUser.LastName,
+                Password = updateUser.Password,
+                UserName = updateUser.UserName,
+                Email = updateUser.Email,
+            };
+            string updateCustomer = _userService.UpdateUser(adminToUpdate);
+            return Ok(updateCustomer);
+          
         }
 
-        [HttpDelete("{username}")]
-        public IActionResult DeleteCustomer(string username)
-        {
-            User existingCustomer = _userService.GetUserByUsername(username);
-            if (existingCustomer == null)
-            {
-                return NotFound($"No se encontró un cliente con el nombre de usuario '{username}'.");
-            }
-            _userService.DeleteUser(username);
-            return NoContent();
-        }
+
 
     }
 
