@@ -1,19 +1,24 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.Globalization;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 
 namespace ProgramacionIII.Data.Entities
 {
     public class SaleOrderLine
     {
-        public int Id { get; set; }
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int SaleOrderLineId { get; set; }
+        public int ProductQuantity { get; set; } //cantidad
 
         [ForeignKey("ProductId")]
-        public  Product Product {  get; set; } 
+        public  Product? Product {  get; set; } 
         public int ProductId { get; set; }
 
-        [ForeignKey("SaleOrder")]
-        public SaleOrder SaleOrder { get; set; } 
+        [ForeignKey("SaleOrderId")]
+        public SaleOrder? SaleOrder { get; set; }
         public int SaleOrderId { get; set; }
-        public int ProductQuantity { get; set; } //cantidad
+
+        public ICollection<Product> Products { get; set; } = new List<Product>();
     }
 }

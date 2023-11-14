@@ -80,21 +80,21 @@ namespace ProgramacionIII.Data.Context
 
             //Customer-SO 1-N
             modelBuilder.Entity<Customer>()
-                .HasMany(s => s.SaleOrders)
-                .WithOne(c => c.Customer) 
-                .HasForeingKey(f => f.CustomerId); 
+                .HasMany(s => s.SaleOrders) //en cust como icolec
+                .WithOne(c => c.Customer)  //en so
+                .HasForeignKey(f => f.CustomerId); 
 
             //SOL - SO 1-N
             modelBuilder.Entity<SaleOrder>()
-                .HasMany(s => s.SaleOrderLines) 
-                .WithOne(c => c.SaleOrder) 
-                .HasForeingKey(f => f.SaleOrderId);
+                .HasMany(s => s.SaleOrderLines) //en so
+                .WithOne(c => c.SaleOrder) //en sol
+                .HasForeignKey(f => f.SaleOrderId);
 
             //SOL - PRODUCT N-1
             modelBuilder.Entity<SaleOrderLine>()
                 .HasOne(s => s.Product) 
                 .WithMany() //no lo quiero guardar
-                .HasForeingKey(f => f.ProductId);
+                .HasForeignKey(f => f.ProductId);
 
             base.OnModelCreating(modelBuilder);
         }

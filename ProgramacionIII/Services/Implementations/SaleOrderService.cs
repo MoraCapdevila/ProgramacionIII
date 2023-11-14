@@ -3,11 +3,11 @@ using ProgramacionIII.Services.Interfaces;
 
 namespace ProgramacionIII.Services.Implementations
 {
-    public class SaleOrderLineService : ISaleOrderLineService
+    public class SaleOrderService : ISaleOrderLineService
     {
         private readonly EcommerceContext _context;
 
-        public SaleOrderLineService(EcommerceContext context) 
+        public SaleOrderService(EcommerceContext context)
         {
             _context = context;
         }

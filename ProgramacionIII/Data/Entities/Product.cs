@@ -14,8 +14,8 @@ namespace ProgramacionIII.Data.Entities
 
         public decimal Price { get; set; }
 
-        public ICollection<Admin> Admins { get; set; } = new List<Admin>();
-        public ICollection<Customer> Customers { get; set; } = new List<Customer>();
-        public ICollection<SaleOrder> SaleOrders { get; set; } = new List<SaleOrder>();
+        //public ICollection<Admin> Admins { get; set; } = new List<Admin>();
+        //public ICollection<Customer> Customers { get; set; } = new List<Customer>();
+        public ICollection<SaleOrderLine> SaleOrderLines { get; set; } = new List<SaleOrderLine>();
     }
 }
