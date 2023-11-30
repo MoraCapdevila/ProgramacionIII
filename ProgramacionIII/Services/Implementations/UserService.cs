@@ -35,39 +35,30 @@ namespace ProgramacionIII.Services.Implementations
             existingUser.UserName = user.UserName;
             existingUser.Password = user.Password;
 
-
             _context.Update(existingUser);
             _context.SaveChanges();
-            return existingUser.UserName;
-          
-
-            
-            
-            
-            //User existingCustomer = _context.Users.FirstOrDefault(u => u.UserName == username);
-
-            //if (existingCustomer != null)
-            //{
-
-            //    existingCustomer.LastName = updateUser.LastName ?? existingCustomer.LastName;
-            //    existingCustomer.Name = updateUser.Name ?? existingCustomer.Name;
-            //    existingCustomer.Password = updateUser.Password ?? existingCustomer.Password;
-            //    existingCustomer.UserName = updateUser.UserName ?? existingCustomer.UserName;
-            //    existingCustomer.UserType = "Customer";
-            //}
-            //_context.SaveChanges();
-         
+            return existingUser.UserName;   
         }
 
-        public void DeleteUser(string userName)
+        public void DeleteUser(string username)
         {
-            User existingCustomer = _context.Users.FirstOrDefault(c => c.UserName == userName);
-            if (existingCustomer != null)
+            User existingUser = _context.Users.FirstOrDefault(c => c.UserName == username);
+            if (existingUser != null)
             {
-                _context.Remove(existingCustomer);
+                _context.Remove(existingUser);
                 _context.SaveChanges();
             }
-            
+
+        }
+
+        public List<User> GetAllCustomers()
+        {
+            return _context.Users.Where(c => c.UserType == "Customer").ToList();
+        }
+
+        public List<User> GetAllAdmins()
+        {
+            return _context.Users.Where(c => c.UserType == "Admin").ToList();
         }
 
     }

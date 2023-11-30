@@ -11,5 +11,8 @@ namespace ProgramacionIII.Services.Interfaces
         public string UpdateUser(User user);
 
         public void DeleteUser(string username);
+
+        public List<User> GetAllCustomers();
+        public List<User> GetAllAdmins();
     }
 }

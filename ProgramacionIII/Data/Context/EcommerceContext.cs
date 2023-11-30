@@ -11,7 +11,6 @@ namespace ProgramacionIII.Data.Context
         public DbSet<SaleOrder> SaleOrders { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<SaleOrderLine> SaleOrderLines { get; set; }
-
         public DbSet<Admin> Admin { get; set; }
 
         
@@ -92,7 +91,7 @@ namespace ProgramacionIII.Data.Context
 
             //SOL - PRODUCT N-1
             modelBuilder.Entity<SaleOrderLine>()
-                .HasOne(s => s.Product) 
+                .HasOne(s => s.Product) //en sol
                 .WithMany() //no lo quiero guardar
                 .HasForeignKey(f => f.ProductId);
 

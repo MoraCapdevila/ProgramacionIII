@@ -7,20 +7,14 @@ namespace ProgramacionIII.Data.Entities
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int SaleOrderId { get; set; }
+        public int Id { get; set; }
 
-        [ForeignKey("UserId")]
-        public int UserId { get; set; } //clave foranea
-
-        //[ForeignKey("ProductId")]
-        //public Product? Product { get; set; }
-        //public int ProductId { get; set; } //clave foranea
-
-        //public double SalePrice { get; set; } //debe coincidir con la porp de product, hacer validacion
+        public float TotalPrice { get; set; }
 
         [ForeignKey("CustomerId")]
+        public int CustomerId { get; set; }
         public Customer? Customer { get; set; }
-        public int CustomerId { get; set; } //clave foranea
+        
 
         public ICollection<SaleOrderLine> SaleOrderLines { get; set; } = new List<SaleOrderLine>();
     }

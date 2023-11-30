@@ -12,15 +12,16 @@ builder.Services.AddDbContext<EcommerceContext>(dbContextOptions => dbContextOpt
     builder.Configuration["DB:ConnectionString"]));
 
 builder.Services.AddControllers();
-
+ 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 //inyecciones
-builder.Services.AddScoped<ICustomerService, CustomerService>();
+//builder.Services.AddScoped<ISaleOrderService, SaleOrderService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<ISaleOrderLineService, SaleOrderLineService>();
+builder.Services.AddScoped<ISaleOrderService, SaleOrderService>();
 
 var app = builder.Build();
 

@@ -12,10 +12,10 @@ namespace ProgramacionIII.Data.Entities
 
         public string? Description { get; set; }
 
-        public decimal Price { get; set; }
+        public float Price { get; set; }
 
-        //public ICollection<Admin> Admins { get; set; } = new List<Admin>();
         //public ICollection<Customer> Customers { get; set; } = new List<Customer>();
-        public ICollection<SaleOrderLine> SaleOrderLines { get; set; } = new List<SaleOrderLine>();
+
+        //public ICollection<SaleOrderLine> SaleOrderLines { get; set; } = new List<SaleOrderLine>();
     }
 }

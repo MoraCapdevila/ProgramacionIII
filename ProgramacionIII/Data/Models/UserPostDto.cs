@@ -2,7 +2,7 @@
 
 namespace ProgramacionIII.Data.Models
 {
-    public class AdminPostDto
+    public class UserPostDto
     {
         public string? Name { get; set; }
         public string? LastName { get; set; }
@@ -11,5 +11,7 @@ namespace ProgramacionIII.Data.Models
         public string? Password { get; set; }
         [Required]
         public string? UserName { get; set; }
+        [Required]
+        public string UserType { get; set; }
     }
 }
