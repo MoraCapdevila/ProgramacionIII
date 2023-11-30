@@ -9,7 +9,11 @@ namespace ProgramacionIII.Data.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        public float TotalPrice { get; set; }
+        public int ProductId { get; set; }
+
+        public int ProductQuantity { get; set; }
+
+        //public float TotalPrice { get; set; }
 
         [ForeignKey("CustomerId")]
         public int CustomerId { get; set; }

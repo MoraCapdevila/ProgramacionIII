@@ -10,8 +10,8 @@ using ProgramacionIII.Data.Context;
 namespace ProgramacionIII.Migrations
 {
     [DbContext(typeof(EcommerceContext))]
-    [Migration("20231129234422_FirstCreate")]
-    partial class FirstCreate
+    [Migration("20231130192059_NewMigration")]
+    partial class NewMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -64,8 +64,11 @@ namespace ProgramacionIII.Migrations
                     b.Property<int>("CustomerId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<float>("TotalPrice")
-                        .HasColumnType("REAL");
+                    b.Property<int>("ProductId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ProductQuantity")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 

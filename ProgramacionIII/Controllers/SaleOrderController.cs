@@ -16,67 +16,89 @@ namespace ProgramacionIII.Controllers
         {
             _saleOrderService = saleOrderService;
         }
-
-        [HttpGet("{SaleOrderId}")] //GetAllOrders
-        public IActionResult GetOne(int SaleOrderId) 
-        {
-            return Ok( _saleOrderService.GetOne(SaleOrderId));
-        }
-
-        [HttpGet("{customerId}")] //GetSaleOrderByCustomer
-        public IActionResult GetSaleOrderByCustomer(int customerId)
+       
+        [HttpGet("all")]
+        public async Task<ActionResult<IEnumerable<SaleOrder>>> GetAllSaleOrders()
         {
             try
             {
-                return Ok(_saleOrderService.GetSaleOrderByCustomer(customerId));
+                var saleOrders = await _saleOrderService.GetAllSaleOrdersAsync();
+                return Ok(saleOrders);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, ex.Message);
             }
-
         }
 
-        //[HttpPost]
-        //public IActionResult AddSaleOrder([FromBody] SaleOrderDto dto)
-        //{
-        //    try
-        //    {
-        //        _saleOrderService.AddSaleOrder(dto);
-        //        return StatusCode(201);
+        [HttpGet("{id}")]
+        public ActionResult<SaleOrder> GetSaleOrderById(int id)
+        {
+            try
+            {
+                var saleOrder = _saleOrderService.GetSaleOrderById(id);
 
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(ex);
-        //    }
-        //}
+                if (saleOrder == null)
+                {
+                    return NotFound($"SaleOrder con ID {id} no encontrada");
+                }
 
-        [HttpPost]
+                return Ok(saleOrder);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpGet("customer/{customerId}")]
+        public ActionResult<IEnumerable<SaleOrder>> GetSaleOrdersByCustomerId(int customerId)
+        {
+            try
+            {
+                var saleOrders = _saleOrderService.GetSaleOrdersByCustomerId(customerId);
+
+                if (saleOrders == null || !saleOrders.Any())
+                {
+                    return NotFound($"No se encontraron ordens del cliente ID {customerId}");
+                }
+
+                return Ok(saleOrders);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+
+        [HttpPost] //crea una orden
         public IActionResult AddSaleOrder([FromBody] SaleOrderDto dto)
         {
             var newSaleOrder = new SaleOrder()
             {
                 CustomerId = dto.CustomerId,
-                TotalPrice = dto.TotalPrice,
+                ProductId = dto.ProductId,
+                ProductQuantity = dto.ProductQuantity,
                 
             };
             newSaleOrder = _saleOrderService.AddSaleOrder(newSaleOrder);
             return Ok($"Orden de venta creada exitosamente con ID: {newSaleOrder.Id}");
         }
 
-        // POST: api/SaleOrder
-        [HttpPost("neworden")]
-        public async Task<ActionResult<SaleOrder>> CreateSaleOrder(CreateSaleOrderDTO createSaleOrderDTO)
+        [HttpDelete("{id}")]
+        public IActionResult DeleteSaleOrder(int id)
         {
             try
             {
-                var newSaleOrder = await _saleOrderService.CreateSaleOrderAsync(createSaleOrderDTO);
-                return CreatedAtAction(nameof(GetOne), new { id = newSaleOrder.Id }, newSaleOrder);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
+                var deleted = _saleOrderService.DeleteSaleOrder(id);
+
+                if (!deleted)
+                {
+                    return NotFound($"SaleOrder coon ID {id} no encontrado");
+                }
+
+                return Ok($"SaleOrder con ID {id} borrado exitosamente");
             }
             catch (Exception ex)
             {
@@ -85,31 +107,35 @@ namespace ProgramacionIII.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult PutSaleOrder(int id, SaleOrderDto dto)
+        public IActionResult UpdateSaleOrder(int id, [FromBody] SaleOrderDto dto)
         {
-            var updated = _saleOrderService.UpdateSaleOrder(id, dto);
-
-            if (!updated)
+            try
             {
-                return NotFound();
+                var saleOrderToUpdate = new SaleOrder()
+                {
+                    Id = id,
+                    CustomerId = dto.CustomerId,
+                    ProductId = dto.ProductId,
+                    ProductQuantity = dto.ProductQuantity,
+                    
+                };
+
+                var updatedSaleOrder = _saleOrderService.UpdateSaleOrder(saleOrderToUpdate);
+
+                if (updatedSaleOrder == null)
+                {
+                    return NotFound($"SaleOrder con ID {id} no encontrado");
+                }
+
+                return Ok($"SaleOrder with ID {id} actualizado con exito");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
             }
 
-            return NoContent();
-        }
+            
 
-        [HttpDelete("{id}")]
-        public IActionResult DeleteSaleOrder(int id)
-        {
-            var deleted = _saleOrderService.DeleteSaleOrder(id);
-
-            if (deleted)
-            {
-                return NoContent(); // La orden de venta fue eliminada con éxito
-            }
-            else
-            {
-                return NotFound("La orden de venta no se encontró."); // Mensaje de error si la orden no se encontró
-            }
         }
     }
 }

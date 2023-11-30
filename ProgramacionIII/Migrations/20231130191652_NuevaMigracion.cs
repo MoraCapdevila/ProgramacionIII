@@ -5,18 +5,24 @@
 namespace ProgramacionIII.Migrations
 {
     /// <inheritdoc />
-    public partial class newDatabase : Migration
+    public partial class NuevaMigracion : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-
+            migrationBuilder.AddColumn<string>(
+                name: "ProductName",
+                table: "SaleOrders",
+                type: "TEXT",
+                nullable: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-
+            migrationBuilder.DropColumn(
+                name: "ProductName",
+                table: "SaleOrders");
         }
     }
 }

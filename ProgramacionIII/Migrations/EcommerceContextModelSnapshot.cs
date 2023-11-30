@@ -61,8 +61,11 @@ namespace ProgramacionIII.Migrations
                     b.Property<int>("CustomerId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<float>("TotalPrice")
-                        .HasColumnType("REAL");
+                    b.Property<int>("ProductId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ProductQuantity")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 

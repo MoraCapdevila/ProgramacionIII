@@ -17,72 +17,24 @@ namespace ProgramacionIII.Services.Implementations
         {
             _context = context;
         }
-
-        public SaleOrder? GetOne(int id)
+        public async Task<IEnumerable<SaleOrder>> GetAllSaleOrdersAsync()
+        {
+            return await _context.SaleOrders.ToListAsync(); // Otra forma es realizar proyecciones, dependiendo de las necesidades
+        }
+        public SaleOrder GetSaleOrderById(int id)
         {
             return _context.SaleOrders
-                            .Include(so => so.Customer)
-                            .Include(sol => sol.SaleOrderLines)
-                            .ThenInclude(p => p.Product)
-                            .SingleOrDefault(x =>x.Id ==id);
+                .FirstOrDefault(so => so.Id == id);
         }
 
-        public List<SaleOrder> GetSaleOrderByCustomer(int customerId)
+        public IEnumerable<SaleOrder> GetSaleOrdersByCustomerId(int customerId)
         {
             return _context.SaleOrders
-                            .Include(so => so.Customer)
-                            .Include(sol => sol.SaleOrderLines)
-                            .ThenInclude(p => p.Product)
-                            .Where(o => o.CustomerId == customerId)
-                            .ToList();
+                .Where(so => so.CustomerId == customerId)
+                .ToList();
         }
 
-        //public void AddSaleOrder(SaleOrderDto dto)
-        //{
 
-        //    SaleOrder newSaleOrder = new SaleOrder
-        //    {
-        //        CustomerId = dto.CustomerId,
-        //        TotalPrice = dto.TotalPrice,
-        //    }; 
-        //    _context.SaleOrders.Add(newSaleOrder);
-        //    _context.SaveChanges();
-        //}
-
-        public async Task<SaleOrder> CreateSaleOrderAsync(CreateSaleOrderDTO createSaleOrderDTO)
-        {
-            var saleOrder = new SaleOrder
-            {
-                CustomerId = createSaleOrderDTO.CustomerId,
-                SaleOrderLines = new List<SaleOrderLine>()
-            };
-
-            foreach (var productQuantityDTO in createSaleOrderDTO.Products)
-            {
-                var product = await _context.Products.FindAsync(productQuantityDTO.ProductId);
-                if (product == null)
-                {
-                    // Manejo de error: producto no encontrado
-                    // Puedes lanzar una excepción o manejarlo según tu lógica de negocio
-                    throw new ArgumentException($"Product with ID {productQuantityDTO.ProductId} not found.");
-                }
-
-                var saleOrderLine = new SaleOrderLine
-                {
-                    ProductId = product.Id,
-                    ProductQuantity = productQuantityDTO.Quantity,
-                    TotalPrice = product.Price * productQuantityDTO.Quantity
-                    // Puedes calcular el precio total por línea según tus necesidades
-                };
-
-                saleOrder.SaleOrderLines.Add(saleOrderLine);
-            }
-
-            _context.SaleOrders.Add(saleOrder);
-            await _context.SaveChangesAsync();
-
-            return saleOrder;
-        }
 
         public SaleOrder AddSaleOrder(SaleOrder saleOrder)
         {
@@ -91,35 +43,37 @@ namespace ProgramacionIII.Services.Implementations
             return saleOrder;
         }
 
-        public bool UpdateSaleOrder(int id, SaleOrderDto dto)
+        public SaleOrder UpdateSaleOrder(SaleOrder saleOrderToUpdate)
         {
-            var saleOrder = _context.SaleOrders.Find(id);
+            var existingSaleOrder = _context.SaleOrders.FirstOrDefault(so => so.Id == saleOrderToUpdate.Id);
 
-            if (saleOrder == null)
+            if (existingSaleOrder == null)
             {
-                return false;
+                return null;
             }
+  
+            existingSaleOrder.CustomerId = saleOrderToUpdate.CustomerId;
+            existingSaleOrder.ProductId = saleOrderToUpdate.ProductId;
+            existingSaleOrder.ProductQuantity = saleOrderToUpdate.ProductQuantity;
 
-            saleOrder.CustomerId = dto.CustomerId;
-            //saleOrder.TotalPrice = dto.TotalPrice;
+            _context.SaveChanges(); 
 
-            _context.SaveChanges();
-
-            return true;
+            return existingSaleOrder;
         }
 
         public bool DeleteSaleOrder(int id)
         {
-            var orderToDelete = _context.SaleOrders.Find(id);
-            if (orderToDelete == null)
+            var saleOrderToDelete = _context.SaleOrders.FirstOrDefault(so => so.Id == id);
+
+            if (saleOrderToDelete == null)
             {
-                return false; // La orden de venta no se encontró
-                
+                return false;
             }
 
-            _context.SaleOrders.Remove(orderToDelete);
-            _context.SaveChanges();
-            return true; // La orden de venta fue eliminada exitosamente
+            _context.SaleOrders.Remove(saleOrderToDelete);
+            _context.SaveChanges(); 
+
+            return true;
         }
     }
 }
