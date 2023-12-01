@@ -1,14 +1,17 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ProgramacionIII.Data.Entities;
 using ProgramacionIII.Data.Models;
 using ProgramacionIII.Services.Implementations;
 using ProgramacionIII.Services.Interfaces;
+using System.Security.Claims;
 
 namespace ProgramacionIII.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ProductController : ControllerBase
     {
         private readonly IProductService _productService;
@@ -22,11 +25,24 @@ namespace ProgramacionIII.Controllers
         [HttpGet("{id}")]
         public IActionResult GetProduct(int id)
         {
-            return Ok(_productService.GetProductById(id)); //GetProductById
+            string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value.ToString();
+            if (role == "Admin")
+            {
+                var product = _productService.GetProductById(id);
+
+                if (product == null)
+                {
+                    return NotFound($"El producto con el ID: {id} no fue encontrado");
+                }
+
+                return Ok(product);
+            }
+            return Forbid();
+           
         }
         
         //GET: api/products
-        [HttpGet]
+        [HttpGet] //all
         public IActionResult GetAllProducts() 
         { 
             return Ok(_productService.GetProducts()); //GetProducts
@@ -35,15 +51,31 @@ namespace ProgramacionIII.Controllers
         // POST: api/products
         [HttpPost]
         public IActionResult PostProduct([FromBody] ProductPostDto productdto)
-        {   
-            var product = new Product()
+        {
+            string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value.ToString();
+            if (role == "Admin")
             {
-                Name = productdto.Name,
-                Description = productdto.Description,
-                Price = productdto.Price,
-            };
-            int id = _productService.CreateProduct(product); //CreateProduct
-            return Ok(id);
+                if (productdto.Name == null || productdto.Price <= 0)
+                {
+                    return BadRequest("No se pudo crear el producto, asegurese de completar correctamente todos los campos");
+                }
+                try
+                {
+                    var product = new Product()
+                    {
+                        Name = productdto.Name,
+                        Description = productdto.Description,
+                        Price = productdto.Price,
+                    };
+                    int id = _productService.CreateProduct(product); //CreateProduct
+                    return Ok(id);
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+            }
+            return Forbid();   
             
         }
 
@@ -67,9 +99,21 @@ namespace ProgramacionIII.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            await _productService.DeleteProduct(id); //DeleteProduct
+            string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value.ToString();
+            if (role == "Admin")
+            {
+                try
+                {
+                    await _productService.DeleteProduct(id); //DeleteProduct
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+            }
+            return Forbid();   
 
-            return NoContent();
+            
         }
     }
 }

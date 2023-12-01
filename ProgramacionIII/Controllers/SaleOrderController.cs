@@ -4,11 +4,14 @@ using ProgramacionIII.Data.Models;
 using ProgramacionIII.Data.Entities;
 using ProgramacionIII.Services.Interfaces;
 using ProgramacionIII.Services.Implementations;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace ProgramacionIII.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class SaleOrderController : ControllerBase
     {
         private readonly ISaleOrderService _saleOrderService;
@@ -23,35 +26,46 @@ namespace ProgramacionIII.Controllers
         [HttpGet("all")]
         public async Task<ActionResult<IEnumerable<SaleOrder>>> GetAllSaleOrders()
         {
-            try
+            string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value.ToString();
+            if (role == "Admin")
             {
-                var saleOrders = await _saleOrderService.GetAllSaleOrdersAsync();
-                return Ok(saleOrders);
+                try
+                {
+                    var saleOrders = await _saleOrderService.GetAllSaleOrdersAsync();
+                    return Ok(saleOrders);
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, ex.Message);
+                }
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Forbid();    
         }
 
         [HttpGet("{id}")]
         public ActionResult<SaleOrder> GetSaleOrderById(int id)
         {
-            try
+            string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value.ToString();
+            if (role == "Admin")
             {
-                var saleOrder = _saleOrderService.GetSaleOrderById(id);
-
-                if (saleOrder == null)
+                try
                 {
-                    return NotFound($"SaleOrder con ID {id} no encontrada");
-                }
+                    var saleOrder = _saleOrderService.GetSaleOrderById(id);
 
-                return Ok(saleOrder);
+                    if (saleOrder == null)
+                    {
+                        return NotFound($"SaleOrder con ID {id} no encontrada");
+                    }
+
+                    return Ok(saleOrder);
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, ex.Message);
+                }
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Forbid();
+
         }
 
         [HttpGet("customer/{customerId}")]
@@ -78,6 +92,7 @@ namespace ProgramacionIII.Controllers
         [HttpPost] //crea una orden
         public IActionResult AddSaleOrder([FromBody] SaleOrderDto dto)
         {
+
             var newSaleOrder = new SaleOrder()
             {
                 CustomerId = dto.CustomerId,
@@ -112,30 +127,35 @@ namespace ProgramacionIII.Controllers
         [HttpPut("{id}")]
         public IActionResult UpdateSaleOrder(int id, [FromBody] SaleOrderDto dto)
         {
-            try
+            string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value.ToString();
+            if (role == "Admin")
             {
-                var saleOrderToUpdate = new SaleOrder()
+                try
                 {
-                    Id = id,
-                    CustomerId = dto.CustomerId,
-                    ProductId = dto.ProductId,
-                    ProductQuantity = dto.ProductQuantity,
+                    var saleOrderToUpdate = new SaleOrder()
+                    {
+                        Id = id,
+                        CustomerId = dto.CustomerId,
+                        ProductId = dto.ProductId,
+                        ProductQuantity = dto.ProductQuantity,
 
-                };
+                    };
 
-                var updatedSaleOrder = _saleOrderService.UpdateSaleOrder(saleOrderToUpdate);
+                    var updatedSaleOrder = _saleOrderService.UpdateSaleOrder(saleOrderToUpdate);
 
-                if (updatedSaleOrder == null)
-                {
-                    return NotFound($"SaleOrder con ID {id} no encontrado");
+                    if (updatedSaleOrder == null)
+                    {
+                        return NotFound($"SaleOrder con ID {id} no encontrado");
+                    }
+
+                    return Ok($"SaleOrder with ID {id} actualizado con exito");
                 }
-
-                return Ok($"SaleOrder with ID {id} actualizado con exito");
+                catch (Exception ex)
+                {
+                    return StatusCode(500, ex.Message);
+                }
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Forbid();   
 
 
 

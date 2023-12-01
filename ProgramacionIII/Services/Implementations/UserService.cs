@@ -26,18 +26,18 @@ namespace ProgramacionIII.Services.Implementations
             return user.Id;
         }
 
-        public string UpdateUser(User user)
+        public User UpdateUser(User user)
         {
-            var existingUser = _context.Users.FirstOrDefault(u => u.UserName == user.UserName);
-            existingUser.Name=user.Name;
-            existingUser.Email=user.Email;
-            existingUser.LastName = user.LastName;
-            existingUser.UserName = user.UserName;
-            existingUser.Password = user.Password;
+            //var existingUser = _context.Users.FirstOrDefault(u => u.UserName == user.UserName);
+            //existingUser.Name=user.Name;
+            //existingUser.Email=user.Email;
+            //existingUser.LastName = user.LastName;
+            //existingUser.UserName = user.UserName;
+            //existingUser.Password = user.Password;
 
-            _context.Update(existingUser);
+            _context.Update(user);
             _context.SaveChanges();
-            return existingUser.UserName;   
+            return user;   
         }
 
         public void DeleteUser(string username)

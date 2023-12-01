@@ -1,15 +1,16 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ProgramacionIII.Data.Entities;
 using ProgramacionIII.Data.Models;
 using ProgramacionIII.Services.Interfaces;
-
-
+using System.Security.Claims;
 
 namespace ProgramacionIII.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class SaleOrderLineController : ControllerBase
     {
         private readonly ISaleOrderLineService _saleOrderLineService;
@@ -19,79 +20,130 @@ namespace ProgramacionIII.Controllers
             _saleOrderLineService = saleOrderLineService;
         }
 
-        [HttpGet]
+        [HttpGet] //all
         public IActionResult GetAllSaleOrderLines()
         {
-            var allSaleOrderLines = _saleOrderLineService.GetAllSaleOrderLines();
+            string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value.ToString();
+            if (role == "Admin")
+            {
+                try
+                {
+                    var allSaleOrderLines = _saleOrderLineService.GetAllSaleOrderLines();
 
-            if (allSaleOrderLines != null && allSaleOrderLines.Any())
-            {
-                return Ok(allSaleOrderLines);
+                    if (allSaleOrderLines != null && allSaleOrderLines.Any())
+                    {
+                        return Ok(allSaleOrderLines);
+                    }
+                    else
+                    {
+                        return NotFound("No SaleOrderLines found");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
             }
-            else
-            {
-                return NotFound("No SaleOrderLines found");
-            }
+            return Forbid();   
         }
 
-        [HttpGet("{saleOrderLineId}")]
+        [HttpGet("{saleOrderLineId}")] //ById
         public IActionResult GetSaleOrderLine(int saleOrderLineId)
         {
-            var saleOrderLine = _saleOrderLineService.GetSaleOrderLine(saleOrderLineId);
-
-            if (saleOrderLine != null)
+            string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value.ToString();
+            if (role == "Admin")
             {
-                var productName = saleOrderLine.Product?.Name;
-                var orderTotalPrice = saleOrderLine.Product?.Price;
-                var productQuantity = saleOrderLine.ProductQuantity;
+                try
+                {
+                    var saleOrderLine = _saleOrderLineService.GetSaleOrderLine(saleOrderLineId);
 
-               
-                    var response = new
+                    if (saleOrderLine != null)
                     {
-                        IdSaleOrderLine = saleOrderLine.SaleOrderLineId,
-                        ProductName = productName,
-                        ProductQuantity = productQuantity,
-                        Price = orderTotalPrice,
-                        TotalPrice = orderTotalPrice * productQuantity,
-                    };
+                        var productName = saleOrderLine.Product?.Name;
+                        var orderTotalPrice = saleOrderLine.Product?.Price;
+                        var productQuantity = saleOrderLine.ProductQuantity;
 
-                    return Ok(response);
+
+                        var response = new
+                        {
+                            IdSaleOrderLine = saleOrderLine.SaleOrderLineId,
+                            ProductName = productName,
+                            ProductQuantity = productQuantity,
+                            Price = orderTotalPrice,
+                            TotalPrice = orderTotalPrice * productQuantity,
+                        };
+
+                        return Ok(response);
+
+                    }
+                    else
+                    {
+                        return NotFound("SaleOrderLine no encontrada"); 
+                    }
+                }
+                catch(Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+            }
+            return Forbid();
                 
-            }
-            else
-            {
-                return NotFound("SaleOrderLine no encontrada"); //traducir
-            }
         }
 
         [HttpDelete("{saleOrderLineId}")]
         public IActionResult DeleteSaleOrderLineById(int saleOrderLineId)
         {
-            var result = _saleOrderLineService.DeleteSaleOrderLineById(saleOrderLineId);
+            string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value.ToString();
+            if (role == "Admin")
+            {
+                try
+                {
+                    var result = _saleOrderLineService.DeleteSaleOrderLineById(saleOrderLineId);
 
-            if (result)
-            {
-                return Ok("SaleOrderLine borrada con exito");
+                    if (result)
+                    {
+                        return Ok("SaleOrderLine borrada con exito");
+                    }
+                    else
+                    {
+                        return NotFound("Error al borrar SaleOrderLine");
+                    }
+                }
+                catch(Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
             }
-            else
-            {
-                return NotFound("Error al borrar SaleOrderLine");
-            }
+            return Forbid();
+                
         }
 
         [HttpPost]
         public IActionResult CreateSaleOrderLine([FromBody] SaleOrderLineDTO dto)
         {
-            int saleOrderLineId = _saleOrderLineService.CreateSaleOrderLine(dto);
+            string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value.ToString();
+            if (role == "Admin")
+            {
+                try
+                {
+                    int saleOrderLineId = _saleOrderLineService.CreateSaleOrderLine(dto);
 
-            if (saleOrderLineId != 0)
-            {
-                return Ok($"SaleOrderLine creada exitosamente con ID: {saleOrderLineId}");
+                    if (saleOrderLineId != 0)
+                    {
+                        return Ok($"SaleOrderLine creada exitosamente con ID: {saleOrderLineId}");
+                    }
+                    else
+                    {
+                        return BadRequest("Error al crear SaleOrderLine");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
             }
-            else
-            {
-                return BadRequest("Error al crear SaleOrderLine");
-            }
+            return Forbid();
+                
 
         }
 

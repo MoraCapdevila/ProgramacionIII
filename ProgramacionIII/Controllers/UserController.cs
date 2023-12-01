@@ -1,15 +1,18 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ProgramacionIII.Data.Entities;
 using ProgramacionIII.Data.Models;
 using ProgramacionIII.Services.Implementations;
 using ProgramacionIII.Services.Interfaces;
+using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 
 namespace ProgramacionIII.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -23,42 +26,111 @@ namespace ProgramacionIII.Controllers
         [HttpGet("GetAllAdmins")]
         public IActionResult GetAllAdmins()
         {
-            return Ok(_userService.GetAllAdmins());
+            try
+            {
+                string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value.ToString();
+                if (role == "Admin") 
+                {
+                    var rta = _userService.GetAllAdmins();
+                    if (rta == null) 
+                    {
+                        return BadRequest(rta);
+                    }
+                    return Ok(rta);
+                }
+                return Forbid("No posee autorizacion");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Error interno del seridor" + ex.Message);
+            }
+            
         }
+
         //GetAdminByUserName
         [HttpGet("GetAdminByUserName/{username}")] //uno x username
         public IActionResult GetAdminsByUsername(string username)
         {
-            return Ok(_userService.GetUserByUsername(username));
+            try
+            {
+                string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value.ToString();
+                if (role == "Admin")
+                {
+                    var rta = _userService.GetUserByUsername(username);
+                    if (rta == null)
+                    {
+                        return BadRequest(rta);
+                    }
+                    return Ok(rta);
+                }
+                return Forbid("No posee autorizacion");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Error interno del seridor" + ex.Message);
+            }
+            
         }
+
         //GetAllCustomers
         [HttpGet("GetAllCustomers")] 
         public IActionResult GetAllCustomers()
         {
-            return Ok(_userService.GetAllCustomers());
+            try
+            {
+                string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value.ToString();
+                if (role == "Admin")
+                {
+                    var rta = _userService.GetAllCustomers();
+                    if (rta == null)
+                    {
+                        return BadRequest(rta);
+                    }
+                    return Ok(rta);
+                }
+                return Forbid("No posee autorizacion");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Error interno del seridor" + ex.Message);
+            }
+            
         }
+
         //DeleteUser
         [HttpDelete("DeleteUser/{username}")]
         public IActionResult DeleteUser(string username)
         {
-            try
+            string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value.ToString();
+            if (role == "Admin")
             {
-                User existingUser = _userService.GetUserByUsername(username);
-                if (existingUser == null)
+                try
                 {
-                    return NotFound($"No se encontró un cliente con el nombre de usuario {username}.");
+                    User existingUser = _userService.GetUserByUsername(username);
+                    if (existingUser == null)
+                    {
+                        return NotFound($"No se encontró un cliente con el nombre de usuario {username}.");
+                    }
+                    _userService.DeleteUser(username);
+                    return Ok("Cliente borrado exitosamente");
                 }
-                _userService.DeleteUser(username);
-                return Ok("Cliente borrado exitosamente");
+                catch (Exception ex)
+                {
+                    return StatusCode(500, $"Ocurrió un error al eliminar el usuario: {ex.Message}");
+                }
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Ocurrió un error al eliminar el usuario: {ex.Message}");
-            }
+            return Forbid();
+                
         }
+
+        //UpdateUser
         [HttpPut("UpdateUser/{username}")]
         public IActionResult UpdateUser([FromRoute] string username, [FromBody] UserPutDto updateUser)
         {
+            if (updateUser.Name == "string" || updateUser.LastName == "string" || updateUser.Email == "string" || updateUser.UserName == "string" || updateUser.Password == "string")
+            {
+                return BadRequest("Por favor complete todos los campos para crear el usuario");
+            }
             var userToUpdate = new Customer()
             {
                 Name = updateUser.Name,
@@ -67,39 +139,38 @@ namespace ProgramacionIII.Controllers
                 UserName = updateUser.UserName,
                 Email = updateUser.Email,
             };
-            string updateCustomer = _userService.UpdateUser(userToUpdate);
+            var updateCustomer = _userService.UpdateUser(userToUpdate);
             return Ok(updateCustomer);
         }
-        //UpdateUser
-        //[HttpPut("UpdateUser/{username}")]
-        //public IActionResult UpdateUser([FromRoute] string username, [FromBody] UserPutDto updateUser)
-        //{
-        //    var userToUpdate = new Customer()
-        //    {
-        //        Name = updateUser.Name,
-        //        LastName = updateUser.LastName,
-        //        Password = updateUser.Password,
-        //        UserName = updateUser.UserName,
-        //        Email = updateUser.Email,
-        //    };
-        //    string updateCustomer = _userService.UpdateUser(userToUpdate);
-        //    return Ok(updateCustomer);
-        //}
+       
         //CreateUser
         [HttpPost("CreateUser")]
         public IActionResult CreateUser([FromBody] UserPostDto dto)
         {
-            var customer = new Customer()
-            {
-                Email = dto.Email,
-                Name = dto.Name,
-                LastName = dto.LastName,
-                Password = dto.Password,
-                UserName = dto.UserName,
-                UserType = dto.UserType,
-            };
-            int id = _userService.CreateUser(customer);
-            return Ok(id);
+                if (dto.Name == "string" || dto.LastName == "string" || dto.Email == "string" || dto.UserName == "string" || dto.Password == "string")
+                {
+                    return BadRequest("Por favor complete todos los campos para crear el usuario");
+                }
+                try
+                {
+                    var customer = new Customer()
+                    {
+                        Email = dto.Email,
+                        Name = dto.Name,
+                        LastName = dto.LastName,
+                        Password = dto.Password,
+                        UserName = dto.UserName,
+                        UserType = dto.UserType,
+                    };
+                    int id = _userService.CreateUser(customer);
+                    return Ok(id);
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+           
+            
         }
 
        
