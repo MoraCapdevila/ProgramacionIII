@@ -8,8 +8,8 @@ namespace ProgramacionIII.Services.Interfaces
         public User? GetUserByUsername(string username);
 
         public int CreateUser(User user);
-        public User UpdateUser(User user);
-
+        
+        public void UpdateUser(User user);
         public void DeleteUser(string username);
 
         public List<User> GetAllCustomers();

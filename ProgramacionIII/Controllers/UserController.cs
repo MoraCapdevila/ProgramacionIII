@@ -127,22 +127,35 @@ namespace ProgramacionIII.Controllers
         [HttpPut("UpdateUser/{username}")]
         public IActionResult UpdateUser([FromRoute] string username, [FromBody] UserPutDto updateUser)
         {
-            if (updateUser.Name == "string" || updateUser.LastName == "string" || updateUser.Email == "string" || updateUser.UserName == "string" || updateUser.Password == "string")
+            try
             {
-                return BadRequest("Por favor complete todos los campos para crear el usuario");
+                if (updateUser == null)
+                {
+                    return BadRequest("Datos de actualización del usuario no proporcionados.");
+                }
+
+                var userToUpdate = _userService.GetUserByUsername(username);
+                if (userToUpdate == null)
+                {
+                    return NotFound($"Usuario con username {username} no encontrado.");
+                }
+
+                
+                userToUpdate.Name = updateUser.Name;
+                userToUpdate.LastName = updateUser.LastName;
+                userToUpdate.Email = updateUser.Email;
+                userToUpdate.UserName = updateUser.UserName;
+                userToUpdate.Password = updateUser.Password;
+
+                _userService.UpdateUser(userToUpdate);
+                return Ok($"Usuario {username} actualizado con éxito.");
             }
-            var userToUpdate = new Customer()
+            catch (Exception ex)
             {
-                Name = updateUser.Name,
-                LastName = updateUser.LastName,
-                Password = updateUser.Password,
-                UserName = updateUser.UserName,
-                Email = updateUser.Email,
-            };
-            var updateCustomer = _userService.UpdateUser(userToUpdate);
-            return Ok(updateCustomer);
+                return StatusCode(500, $"Error al actualizar el usuario: {ex.Message}");
+            }
         }
-       
+
         //CreateUser
         [HttpPost("CreateUser")]
         public IActionResult CreateUser([FromBody] UserPostDto dto)

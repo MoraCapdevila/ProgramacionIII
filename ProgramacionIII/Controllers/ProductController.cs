@@ -6,6 +6,7 @@ using ProgramacionIII.Data.Models;
 using ProgramacionIII.Services.Implementations;
 using ProgramacionIII.Services.Interfaces;
 using System.Security.Claims;
+using System.Xml.Linq;
 
 namespace ProgramacionIII.Controllers
 {
@@ -38,13 +39,13 @@ namespace ProgramacionIII.Controllers
                 return Ok(product);
             }
             return Forbid();
-           
+
         }
-        
+
         //GET: api/products
         [HttpGet] //all
-        public IActionResult GetAllProducts() 
-        { 
+        public IActionResult GetAllProducts()
+        {
             return Ok(_productService.GetProducts()); //GetProducts
         }
 
@@ -75,25 +76,44 @@ namespace ProgramacionIII.Controllers
                     return BadRequest(ex.Message);
                 }
             }
-            return Forbid();   
-            
+            return Forbid();
+
         }
 
-        // PUT: api/products/{id}
+
+
         [HttpPut("{id}")]
-        public IActionResult UpdateProduct([FromBody] ProductPutDto dto)
+        public IActionResult PutProduct([FromRoute] int id, [FromBody] ProductPutDto productDto)
         {
-            var product = new Product()
+            string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value.ToString();
+            if (role == "Admin")
             {
-                Name= dto.Name,
-                Description= dto.Description,
-                Price = dto.Price,
-            };
-            
-            _productService.UpdateProduct(product); //UpdateProduct
+                try
+                {
+                    if (productDto == null)
+                    {
+                        return BadRequest("Datos de actualización del producto no proporcionados.");
+                    }
+                    var productUpdate = _productService.GetProductById(id);
+                    if (productUpdate == null)
+                    {
+                        return NotFound($"Producto con id {id} no encontrado.");
+                    }
+                    productUpdate.Name = productDto.Name;
+                    productUpdate.Description = productDto.Description;
+                    productUpdate.Price = productDto.Price;
 
-            return Ok("Producto actualizado con exito");
+                    _productService.UpdateProduct(productUpdate);
+                    return Ok($"Producto {id} actualizado con éxito.");
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, $"Error al actualizar el producto: {ex.Message}");
+                }
+            }
+            return Forbid();   
         }
+       
 
         // DELETE: api/products/{id}
         [HttpDelete("{id}")]
