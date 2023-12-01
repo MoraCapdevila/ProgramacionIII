@@ -19,17 +19,20 @@ namespace ProgramacionIII.Services.Implementations
         }
         public async Task<IEnumerable<SaleOrder>> GetAllSaleOrdersAsync()
         {
-            return await _context.SaleOrders.ToListAsync(); // Otra forma es realizar proyecciones, dependiendo de las necesidades
+            return await _context.SaleOrders.ToListAsync(); 
         }
         public SaleOrder GetSaleOrderById(int id)
         {
             return _context.SaleOrders
+                .Include(so => so.Customer)
                 .FirstOrDefault(so => so.Id == id);
+
         }
 
         public IEnumerable<SaleOrder> GetSaleOrdersByCustomerId(int customerId)
         {
             return _context.SaleOrders
+                .Include(so =>so.Customer)
                 .Where(so => so.CustomerId == customerId)
                 .ToList();
         }

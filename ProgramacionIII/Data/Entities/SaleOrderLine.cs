@@ -10,7 +10,7 @@ namespace ProgramacionIII.Data.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int SaleOrderLineId { get; set; }
         public int ProductQuantity { get; set; } //cantidad
-        public float TotalPrice { get; set; }
+        public double TotalPrice { get; set; }
 
         [ForeignKey("ProductId")]
         public int ProductId { get; set; }
@@ -18,11 +18,9 @@ namespace ProgramacionIII.Data.Entities
         
 
         [ForeignKey("SaleOrderId")]
-        public int SaleOrderId { get; set; }
         public SaleOrder? SaleOrder { get; set; }
+        public int SaleOrderId { get; set; }
         
-
-        //public ICollection<Product> Products { get; set; } = new List<Product>();
-        //public ICollection<SaleOrder> SaleOrders { get; set; } = new List<SaleOrder>();
+        
     }
 }

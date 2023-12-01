@@ -14,5 +14,8 @@ namespace ProgramacionIII.Services.Interfaces
 
         public List<User> GetAllCustomers();
         public List<User> GetAllAdmins();
+
+        public User GetByEmail(string email);
+        public BaseResponse ValidarUsuario(string username, string password);
     }
 }

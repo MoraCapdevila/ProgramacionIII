@@ -1,4 +1,6 @@
-﻿namespace ProgramacionIII.Data.Models
+﻿using ProgramacionIII.Data.Entities;
+
+namespace ProgramacionIII.Data.Models
 {
     public class SaleOrderDto
     {
@@ -6,5 +8,6 @@
         //public float TotalPrice { get; set; }
         public int ProductId { get; set; }
         public int ProductQuantity { get; set; }
+
     }
 }

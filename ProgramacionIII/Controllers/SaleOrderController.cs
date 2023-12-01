@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ProgramacionIII.Data.Models;
 using ProgramacionIII.Data.Entities;
 using ProgramacionIII.Services.Interfaces;
+using ProgramacionIII.Services.Implementations;
 
 namespace ProgramacionIII.Controllers
 {
@@ -16,7 +17,9 @@ namespace ProgramacionIII.Controllers
         {
             _saleOrderService = saleOrderService;
         }
-       
+
+
+
         [HttpGet("all")]
         public async Task<ActionResult<IEnumerable<SaleOrder>>> GetAllSaleOrders()
         {
@@ -80,7 +83,7 @@ namespace ProgramacionIII.Controllers
                 CustomerId = dto.CustomerId,
                 ProductId = dto.ProductId,
                 ProductQuantity = dto.ProductQuantity,
-                
+
             };
             newSaleOrder = _saleOrderService.AddSaleOrder(newSaleOrder);
             return Ok($"Orden de venta creada exitosamente con ID: {newSaleOrder.Id}");
@@ -117,7 +120,7 @@ namespace ProgramacionIII.Controllers
                     CustomerId = dto.CustomerId,
                     ProductId = dto.ProductId,
                     ProductQuantity = dto.ProductQuantity,
-                    
+
                 };
 
                 var updatedSaleOrder = _saleOrderService.UpdateSaleOrder(saleOrderToUpdate);
@@ -134,7 +137,7 @@ namespace ProgramacionIII.Controllers
                 return StatusCode(500, ex.Message);
             }
 
-            
+
 
         }
     }

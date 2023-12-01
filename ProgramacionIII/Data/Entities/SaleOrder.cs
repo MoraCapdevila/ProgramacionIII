@@ -16,9 +16,8 @@ namespace ProgramacionIII.Data.Entities
         //public float TotalPrice { get; set; }
 
         [ForeignKey("CustomerId")]
-        public int CustomerId { get; set; }
         public Customer? Customer { get; set; }
-        
+        public int CustomerId { get; set; } 
 
         public ICollection<SaleOrderLine> SaleOrderLines { get; set; } = new List<SaleOrderLine>();
     }

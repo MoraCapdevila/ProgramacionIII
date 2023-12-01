@@ -61,5 +61,36 @@ namespace ProgramacionIII.Services.Implementations
             return _context.Users.Where(c => c.UserType == "Admin").ToList();
         }
 
+        //para el authenticate
+
+        public User GetByEmail(string email)
+        {
+            return _context.Users.SingleOrDefault(u => u.Email == email);
+        }
+        public BaseResponse ValidarUsuario(string email, string password)
+        {
+            BaseResponse response = new BaseResponse();
+            User? userForLogin = _context.Users.SingleOrDefault(u => u.Email == email);
+            if (userForLogin != null)
+            {
+                if (userForLogin.Password == password)
+                {
+                    response.Result = true;
+                    response.Message = "loging Succesfull";
+                }
+                else
+                {
+                    response.Result = false;
+                    response.Message = "wrong password";
+                }
+            }
+            else
+            {
+                response.Result = false;
+                response.Message = "wrong email";
+            }
+            return response;
+        }
+
     }
 }
